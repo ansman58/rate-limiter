@@ -7,8 +7,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
-    "migrate": "node db/migrations/run.js",
-    "seed": "node db/seeds/run.js",
+    "migrate": "tsx db/migrations/run.ts",
+    "seed": "tsx db/seeds/run.ts",
     "test": "jest --detectOpenHandles"
   },
   "keywords": [
