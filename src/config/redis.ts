@@ -4,16 +4,22 @@ import Redis from 'ioredis';
  * Creates and returns a Redis client instance.
  */
 export function createRedisClient(): Redis {
-  const client = new Redis({
-    host: process.env.REDIS_HOST || 'localhost',
-    port: parseInt(process.env.REDIS_PORT || '6379', 10),
-    password: process.env.REDIS_PASSWORD || undefined,
+  const connectionOptions = {
     maxRetriesPerRequest: 3,
     retryStrategy(times: number) {
       const delay = Math.min(times * 200, 5000);
       return delay;
     },
-  });
+  };
+
+  const client = process.env.REDIS_URL
+    ? new Redis(process.env.REDIS_URL, connectionOptions)
+    : new Redis({
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379', 10),
+        password: process.env.REDIS_PASSWORD || undefined,
+        ...connectionOptions,
+      });
 
   client.on('connect', () => {
     console.log('✅ Redis connected');
