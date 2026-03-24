@@ -4,7 +4,7 @@ import { buildApp } from './app';
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
 
-async function start(): Promise<void> {
+(async function start(): Promise<void> {
   const app = await buildApp();
 
   try {
@@ -14,6 +14,6 @@ async function start(): Promise<void> {
     app.log.error(err);
     process.exit(1);
   }
-}
+})();
 
-start();
+// start();
