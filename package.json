@@ -1,6 +1,6 @@
 {
   "name": "rate-limiter",
-  "version": "1.0.0",
+  "version": "deploy",
   "description": "A configurable rate limiter service with multiple algorithms",
   "main": "dist/server.js",
   "scripts": {
