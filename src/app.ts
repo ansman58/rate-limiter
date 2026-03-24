@@ -11,14 +11,6 @@ interface BuildAppOptions {
   logLevel?: string;
 }
 
-/**
- * Build and configure the Fastify application.
- */
-// export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInstance> {
-// const app = Fastify({
-//   logger: opts.logger !== false ? { level: opts.logLevel || 'info' } : false,
-// });
-
 const app = Fastify({
   logger: true,
 });
@@ -54,4 +46,3 @@ app.get("/health", async () => ({
 }));
 
 export default app;
-// }
