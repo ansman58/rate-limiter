@@ -18,8 +18,14 @@ export function createRedisClient(): Redis {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379', 10),
         password: process.env.REDIS_PASSWORD || undefined,
+        lazyConnect: true,
         ...connectionOptions,
       });
+
+  // Automatically connect if URL is available or trigger lazily
+  if (process.env.REDIS_URL) {
+     client.connect().catch(() => {});
+  }
 
   client.on('connect', () => {
     console.log('✅ Redis connected');

@@ -1,3 +1,5 @@
+import fs from "fs";
+
 import path from "path";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
@@ -10,11 +12,19 @@ const app = Fastify({
   logger: true,
 });
 
-// --- Serve static UI dashboard ---
-app.register(fastifyStatic, {
-  root: path.join(__dirname, "..", "public"),
-  prefix: "/",
-});
+
+// --- Serve static UI dashboard (Bypass fastify-static stream bug on Vercel) ---
+if (process.env.VERCEL) {
+  app.get("/", async (request, reply) => {
+    const html = fs.readFileSync(path.join(__dirname, "..", "public", "index.html"), "utf8");
+    return reply.type("text/html").send(html);
+  });
+} else {
+  app.register(fastifyStatic, {
+    root: path.join(__dirname, "..", "public"),
+    prefix: "/",
+  });
+}
 
 // --- Decorate with Redis ---
 const redis = createRedisClient();
