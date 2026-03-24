@@ -10,9 +10,13 @@ export function createPool(): Pool {
     connectionTimeoutMillis: 5000,
   };
 
-  const pool = process.env.POSTGRES_URL
+  const connectionString = process.env.POSTGRES_URL;
+  const isSslNeeded = connectionString && !connectionString.includes('localhost');
+
+  const pool = connectionString
     ? new Pool({
-        connectionString: process.env.POSTGRES_URL,
+        connectionString,
+        ssl: isSslNeeded ? { rejectUnauthorized: false } : undefined,
         ...commonOptions,
       })
     : new Pool({
