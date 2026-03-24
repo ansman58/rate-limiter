@@ -1,15 +1,10 @@
 import path from "path";
-import Fastify, { type FastifyInstance } from "fastify";
+import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import { createRedisClient } from "./config/redis";
 import { createPool } from "./config/db";
 import checkRoutes from "./routes/check";
 import adminRoutes from "./routes/admin";
-
-interface BuildAppOptions {
-  logger?: boolean | object;
-  logLevel?: string;
-}
 
 const app = Fastify({
   logger: true,

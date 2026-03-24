@@ -1,5 +1,4 @@
-import { buildApp } from '../src/app';
-import type { FastifyInstance } from 'fastify';
+import app from '../src/fastify';
 
 /**
  * Concurrency / race condition tests.
@@ -9,10 +8,7 @@ import type { FastifyInstance } from 'fastify';
  * without race conditions.
  */
 describe('Concurrency - Race Condition Test', () => {
-  let app: FastifyInstance;
-
   beforeAll(async () => {
-    app = await buildApp({ logger: false });
     await app.ready();
   });
 

@@ -1,11 +1,7 @@
-import { buildApp } from '../src/app';
-import type { FastifyInstance } from 'fastify';
+import app from '../src/fastify';
 
 describe('POST /check route', () => {
-  let app: FastifyInstance;
-
   beforeAll(async () => {
-    app = await buildApp({ logger: false });
     await app.ready();
   });
 

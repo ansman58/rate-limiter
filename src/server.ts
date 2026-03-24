@@ -1,5 +1,5 @@
 import "dotenv/config";
-import app from "./app";
+import app from "./fastify";
 
 const PORT = parseInt(process.env.PORT || "3000", 10);
 const HOST = process.env.HOST || "0.0.0.0";
