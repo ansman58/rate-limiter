@@ -1,10 +1,10 @@
-import path from 'path';
-import Fastify, { type FastifyInstance } from 'fastify';
-import fastifyStatic from '@fastify/static';
-import { createRedisClient } from './config/redis';
-import { createPool } from './config/db';
-import checkRoutes from './routes/check';
-import adminRoutes from './routes/admin';
+import path from "path";
+import Fastify, { type FastifyInstance } from "fastify";
+import fastifyStatic from "@fastify/static";
+import { createRedisClient } from "./config/redis";
+import { createPool } from "./config/db";
+import checkRoutes from "./routes/check";
+import adminRoutes from "./routes/admin";
 
 interface BuildAppOptions {
   logger?: boolean | object;
@@ -14,40 +14,44 @@ interface BuildAppOptions {
 /**
  * Build and configure the Fastify application.
  */
-export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInstance> {
-  const app = Fastify({
-    logger: opts.logger !== false ? { level: opts.logLevel || 'info' } : false,
-  });
+// export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInstance> {
+// const app = Fastify({
+//   logger: opts.logger !== false ? { level: opts.logLevel || 'info' } : false,
+// });
 
-  // --- Serve static UI dashboard ---
-  app.register(fastifyStatic, {
-    root: path.join(__dirname, '..', 'public'),
-    prefix: '/',
-  });
+const app = Fastify({
+  logger: true,
+});
 
-  // --- Decorate with Redis ---
-  const redis = createRedisClient();
-  app.decorate('redis', redis);
-  app.addHook('onClose', async () => {
-    await redis.quit();
-  });
+// --- Serve static UI dashboard ---
+app.register(fastifyStatic, {
+  root: path.join(__dirname, "..", "public"),
+  prefix: "/",
+});
 
-  // --- Decorate with Postgres ---
-  const pg = createPool();
-  app.decorate('pg', pg);
-  app.addHook('onClose', async () => {
-    await pg.end();
-  });
+// --- Decorate with Redis ---
+const redis = createRedisClient();
+app.decorate("redis", redis);
+app.addHook("onClose", async () => {
+  await redis.quit();
+});
 
-  // --- Register routes ---
-  app.register(checkRoutes);
-  app.register(adminRoutes);
+// --- Decorate with Postgres ---
+const pg = createPool();
+app.decorate("pg", pg);
+app.addHook("onClose", async () => {
+  await pg.end();
+});
 
-  // --- Health check ---
-  app.get('/health', async () => ({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-  }));
+// --- Register routes ---
+app.register(checkRoutes);
+app.register(adminRoutes);
 
-  return app;
-}
+// --- Health check ---
+app.get("/health", async () => ({
+  status: "ok",
+  timestamp: new Date().toISOString(),
+}));
+
+export default app;
+// }

@@ -1,11 +1,11 @@
 import "dotenv/config";
-import { buildApp } from "./app";
+import app from "./app";
 
 const PORT = parseInt(process.env.PORT || "3000", 10);
 const HOST = process.env.HOST || "0.0.0.0";
 
 async function start(): Promise<void> {
-  const app = await buildApp();
+  // const app = await buildApp();
 
   try {
     await app.listen({ port: PORT, host: HOST });
