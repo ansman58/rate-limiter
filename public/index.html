@@ -254,6 +254,10 @@
       <div class="section-header">
         <div class="section-title">Registered Clients</div>
       </div>
+      <div class="info-banner">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <span>View all configured API consumers and their corresponding rate-limit rules. This includes both persistent system clients and your local browser session clients.</span>
+      </div>
       <div id="clientsContainer">
         <div class="empty-state">
           <div class="empty-icon">
@@ -315,6 +319,10 @@
     <!-- Check Limit Section -->
     <div class="section" id="section-check">
       <div class="section-title">Check Rate Limit</div>
+      <div class="info-banner">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <span>Test a single request against a client to determine if their access is <strong>Allowed</strong> or <strong>Blocked</strong>, and instantly see their remaining token quota.</span>
+      </div>
       <div class="card">
         <form class="form-grid" id="checkForm">
           <div class="form-row">
@@ -336,6 +344,10 @@
     <!-- Burst Test Section -->
     <div class="section" id="section-burst">
       <div class="section-title">Burst Traffic Simulator</div>
+      <div class="info-banner">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <span>Fire rapid, continuous requests sequentially to observe how effectively the system detects traffic spikes and blocks abuse in real-time according to that client's specific algorithm.</span>
+      </div>
       <div class="card">
         <div class="burst-config">
           <div class="form-group">
