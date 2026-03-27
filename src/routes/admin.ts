@@ -39,8 +39,13 @@ export default async function adminRoutes(fastify: FastifyInstance): Promise<voi
   );
 
   // GET /clients — List all registered clients
-  fastify.get('/clients', async () => {
-    const clients = await getAllClients(fastify as AppInstance);
-    return clients;
+  fastify.get('/clients', async (request, reply) => {
+    try {
+      const clients = await getAllClients(fastify as AppInstance);
+      return clients;
+    } catch (err) {
+      fastify.log.error(err, 'Failed to fetch clients from DB');
+      return reply.code(200).send([]);
+    }
   });
 }
