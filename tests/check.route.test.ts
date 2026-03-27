@@ -23,7 +23,7 @@ describe('POST /check route', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/check',
-      payload: { clientId: 'test-client', endpoint: '/api/data' },
+      payload: { clientId: 'test-client' },
     });
 
     expect([200, 404, 429]).toContain(response.statusCode);

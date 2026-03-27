@@ -8,7 +8,6 @@ export const checkSchema = {
   required: ['clientId'],
   properties: {
     clientId: { type: 'string', minLength: 1 },
-    endpoint: { type: 'string', minLength: 1 },
     inlineConfig: {
       type: 'object',
       required: ['algorithm', 'limit', 'windowMs'],

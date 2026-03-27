@@ -33,7 +33,6 @@ class InternalError extends Error {
 export async function checkRateLimit(
   app: AppInstance,
   clientId: string,
-  endpoint: string = '/',
   inlineConfig?: InlineClientConfig,
 ): Promise<RateLimitResult> {
   let algorithm: AlgorithmName;
@@ -63,7 +62,7 @@ export async function checkRateLimit(
     throw new InternalError(`Unknown algorithm: ${algorithm}`);
   }
 
-  const key = `${clientId}:${endpoint}`;
+  const key = `${clientId}`;
 
   if (algorithm === 'token-bucket') {
     return algorithmFn(app.redis, key, maxRequests, refillRate || 1);

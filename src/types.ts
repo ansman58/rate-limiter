@@ -44,7 +44,6 @@ export interface InlineClientConfig {
 /** Request body for POST /check */
 export interface CheckBody {
   clientId: string;
-  endpoint?: string;
   /** Passed by the frontend for browser-local clients to avoid hitting the DB */
   inlineConfig?: InlineClientConfig;
 }

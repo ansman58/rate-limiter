@@ -18,7 +18,7 @@ describe('Concurrency - Race Condition Test', () => {
 
   test('should handle concurrent requests without race conditions', async () => {
     const concurrentRequests = 20;
-    const payload = { clientId: 'concurrent-test', endpoint: '/api/test' };
+    const payload = { clientId: 'concurrent-test' };
 
     const promises = Array.from({ length: concurrentRequests }, () =>
       app.inject({
