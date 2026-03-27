@@ -2,7 +2,7 @@ import { fixedWindow } from '../algorithms/fixedWindow';
 import { slidingWindow } from '../algorithms/slidingWindow';
 import { tokenBucket } from '../algorithms/tokenBucket';
 import { getClientConfig } from './clientConfig';
-import type { AlgorithmFn, AlgorithmName, AppInstance, RateLimitResult } from '../types';
+import type { AlgorithmFn, AlgorithmName, AppInstance, InlineClientConfig, RateLimitResult } from '../types';
 
 const algorithms: Record<AlgorithmName, AlgorithmFn> = {
   'fixed-window': fixedWindow,
@@ -28,29 +28,46 @@ class InternalError extends Error {
 
 /**
  * Core rate limiting logic.
- * Fetches the client config, picks the correct algorithm, and executes it.
+ * Fetches the client config (from DB or inline), picks the correct algorithm, and executes it.
  */
 export async function checkRateLimit(
   app: AppInstance,
   clientId: string,
   endpoint: string = '/',
+  inlineConfig?: InlineClientConfig,
 ): Promise<RateLimitResult> {
-  const config = await getClientConfig(app, clientId);
+  let algorithm: AlgorithmName;
+  let maxRequests: number;
+  let windowMs: number;
+  let refillRate: number | null;
 
-  if (!config) {
-    throw new NotFoundError(`Client "${clientId}" not found`);
+  if (inlineConfig) {
+    // Browser-local client — use the config provided by the frontend directly
+    algorithm = inlineConfig.algorithm;
+    maxRequests = inlineConfig.limit;
+    windowMs = inlineConfig.windowMs;
+    refillRate = inlineConfig.refillRate ?? null;
+  } else {
+    const config = await getClientConfig(app, clientId);
+    if (!config) {
+      throw new NotFoundError(`Client "${clientId}" not found`);
+    }
+    algorithm = config.algorithm;
+    maxRequests = config.max_requests;
+    windowMs = config.window_ms;
+    refillRate = config.refill_rate;
   }
 
-  const algorithmFn = algorithms[config.algorithm];
+  const algorithmFn = algorithms[algorithm];
   if (!algorithmFn) {
-    throw new InternalError(`Unknown algorithm: ${config.algorithm}`);
+    throw new InternalError(`Unknown algorithm: ${algorithm}`);
   }
 
   const key = `${clientId}:${endpoint}`;
 
-  if (config.algorithm === 'token-bucket') {
-    return algorithmFn(app.redis, key, config.max_requests, config.refill_rate || 1);
+  if (algorithm === 'token-bucket') {
+    return algorithmFn(app.redis, key, maxRequests, refillRate || 1);
   }
 
-  return algorithmFn(app.redis, key, config.max_requests, config.window_ms);
+  return algorithmFn(app.redis, key, maxRequests, windowMs);
 }

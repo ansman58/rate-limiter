@@ -33,10 +33,20 @@ export interface ClientConfig {
   updated_at: string;
 }
 
+/** Inline client config for browser-local clients (not stored in DB) */
+export interface InlineClientConfig {
+  algorithm: AlgorithmName;
+  limit: number;
+  windowMs: number;
+  refillRate?: number;
+}
+
 /** Request body for POST /check */
 export interface CheckBody {
   clientId: string;
   endpoint?: string;
+  /** Passed by the frontend for browser-local clients to avoid hitting the DB */
+  inlineConfig?: InlineClientConfig;
 }
 
 /** Request body for POST /clients */

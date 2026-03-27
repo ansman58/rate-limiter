@@ -25,6 +25,8 @@
       --red-bg: #fee2e2;
       --yellow: #ca8a04;
       --yellow-bg: #fef9c3;
+      --purple: #7c3aed;
+      --purple-bg: rgba(124,58,237,0.08);
       --radius: 8px;
     }
 
@@ -45,6 +47,8 @@
         --red-bg: rgba(239, 68, 68, 0.15);
         --yellow: #eab308;
         --yellow-bg: rgba(234, 179, 8, 0.15);
+        --purple: #a78bfa;
+        --purple-bg: rgba(167,139,250,0.12);
       }
     }
 
@@ -88,16 +92,31 @@
 
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
     
+    /* Section header row */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .section-header .section-title { margin-bottom: 0; }
+
+    /* Group label */
+    .group-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--text-dim); margin-bottom: 10px; margin-top: 24px;
+    }
+    .group-label:first-child { margin-top: 0; }
+
     /* Grid for Clients */
     .clients-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
     .client-card { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
     .client-header { display: flex; justify-content: space-between; align-items: center; }
     .client-id { font-weight: 600; font-size: 15px; }
     .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; background: var(--surface-hover); border: 1px solid var(--border); color: var(--text-dim); }
+    .badge-yours { background: var(--purple-bg); border-color: var(--purple); color: var(--purple); }
     
     .client-stats { display: flex; gap: 16px; font-size: 13px; color: var(--text-dim); }
     .stat-label { font-weight: 500; }
     .stat-value { color: var(--text); margin-left: 4px; }
+
+    .client-actions { display: flex; gap: 8px; }
+    .client-actions .btn { flex: 1; }
 
     /* Forms */
     .form-grid { display: grid; gap: 20px; }
@@ -111,6 +130,15 @@
     .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
     .hint { font-size: 12px; color: var(--text-dim); }
 
+    /* Info banner */
+    .info-banner {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 16px; border-radius: 6px; font-size: 13px;
+      background: var(--purple-bg); border: 1px solid var(--purple);
+      color: var(--text); margin-bottom: 20px;
+    }
+    .info-banner svg { flex-shrink: 0; margin-top: 1px; color: var(--purple); }
+
     /* Buttons */
     .btn {
       padding: 10px 16px; border: none; border-radius: 6px; font-size: 14px; font-weight: 500;
@@ -121,6 +149,8 @@
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-secondary { background: var(--surface-hover); color: var(--text); border: 1px solid var(--border); }
     .btn-secondary:hover { background: var(--border); }
+    .btn-danger { background: transparent; color: var(--red); border: 1px solid var(--red); }
+    .btn-danger:hover { background: var(--red-bg); }
 
     .btn-small { padding: 8px 12px; font-size: 13px; width: 100%; }
 
@@ -174,6 +204,7 @@
       .form-row { grid-template-columns: 1fr; }
       .client-header { flex-direction: column; align-items: flex-start; gap: 8px; }
       .client-stats { flex-direction: column; gap: 4px; }
+      .client-actions { flex-direction: column; }
       .burst-config { flex-direction: column; align-items: stretch; }
       .burst-config .form-group { width: 100%; }
       .burst-config .btn { width: 100%; margin-top: 8px; height: 42px; }
@@ -220,11 +251,11 @@
 
     <!-- Clients Section -->
     <div class="section active" id="section-clients">
-      <div class="section-title">
-        Registered Clients
+      <div class="section-header">
+        <div class="section-title">Registered Clients</div>
       </div>
-      <div class="clients-grid" id="clientsGrid">
-        <div class="empty-state" style="grid-column: 1/-1;">
+      <div id="clientsContainer">
+        <div class="empty-state">
           <div class="empty-icon">
              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
           </div>
@@ -236,6 +267,10 @@
     <!-- Register Section -->
     <div class="section" id="section-register">
       <div class="section-title">Register a New Client</div>
+      <div class="info-banner">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <span>Clients you create are saved <strong>in your browser only</strong> and won't be visible to other visitors. They're stored in <code>localStorage</code> and will persist across page reloads.</span>
+      </div>
       <div class="card">
         <form class="form-grid" id="registerForm">
           <div class="form-row">
@@ -346,8 +381,50 @@
 
   <script>
     const API = '';
+    const LOCAL_STORAGE_KEY = 'rate_limiter_local_clients';
 
-    // --- Tab Navigation ---
+    // ── localStorage helpers ──────────────────────────────────────────────────
+
+    function getLocalClients() {
+      try {
+        return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '[]');
+      } catch {
+        return [];
+      }
+    }
+
+    function saveLocalClients(clients) {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(clients));
+    }
+
+    function addLocalClient(client) {
+      const clients = getLocalClients();
+      // prevent duplicates
+      const exists = clients.findIndex(c => c.client_id === client.client_id);
+      if (exists !== -1) clients.splice(exists, 1);
+      clients.unshift(client);
+      saveLocalClients(clients);
+    }
+
+    function removeLocalClient(clientId) {
+      const clients = getLocalClients().filter(c => c.client_id !== clientId);
+      saveLocalClients(clients);
+    }
+
+    /** Returns the inline config for a local client, or null if it's a seeded client. */
+    function getLocalClientConfig(clientId) {
+      const client = getLocalClients().find(c => c.client_id === clientId);
+      if (!client) return null;
+      return {
+        algorithm: client.algorithm,
+        limit: client.max_requests,
+        windowMs: client.window_ms,
+        refillRate: client.refill_rate ?? undefined,
+      };
+    }
+
+    // ── Tab Navigation ────────────────────────────────────────────────────────
+
     document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -357,7 +434,8 @@
       });
     });
 
-    // --- Toast Notifications ---
+    // ── Toast Notifications ───────────────────────────────────────────────────
+
     function showToast(message, type = 'success') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
@@ -372,102 +450,155 @@
       setTimeout(() => toast.remove(), 4000);
     }
 
-    // --- Load Clients ---
-    async function loadClients() {
-      const grid = document.getElementById('clientsGrid');
-      try {
-        const res = await fetch(API + '/clients');
-        if (!res.ok) throw new Error('Failed to load clients');
-        const clients = await res.json();
+    // ── Load Clients ──────────────────────────────────────────────────────────
 
-        if (clients.length === 0) {
-          grid.innerHTML = `
-            <div class="empty-state" style="grid-column: 1/-1;">
-              <div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-              <p>No clients registered. Create your first configuration to get started.</p>
-            </div>`;
-          return;
-        }
+    function renderClientCard(c, isLocal = false) {
+      const deleteBtn = isLocal ? `
+        <button class="btn btn-danger btn-small" onclick="deleteLocalClient('${escapeHtml(c.client_id)}')">
+          Delete
+        </button>` : '';
 
-        grid.innerHTML = clients.map(c => `
-          <div class="card client-card">
-            <div class="client-header">
-              <div class="client-id">${escapeHtml(c.client_id)}</div>
-              <span class="badge">${c.algorithm}</span>
-            </div>
-            <div class="client-stats">
-              <div><span class="stat-label">Limit:</span><span class="stat-value">${c.max_requests}</span></div>
-              <div><span class="stat-label">Window:</span><span class="stat-value">${c.window_ms}ms</span></div>
-            </div>
+      const badgeClass = isLocal ? 'badge badge-yours' : 'badge';
+      const badgeLabel = isLocal ? 'Your client' : c.algorithm;
+      const algorithmRow = isLocal ? `
+        <div><span class="stat-label">Algorithm:</span><span class="stat-value">${c.algorithm}</span></div>` : '';
+
+      return `
+        <div class="card client-card">
+          <div class="client-header">
+            <div class="client-id">${escapeHtml(c.client_id)}</div>
+            <span class="${badgeClass}">${badgeLabel}</span>
+          </div>
+          <div class="client-stats">
+            ${algorithmRow}
+            <div><span class="stat-label">Limit:</span><span class="stat-value">${c.max_requests}</span></div>
+            <div><span class="stat-label">Window:</span><span class="stat-value">${c.window_ms}ms</span></div>
+          </div>
+          <div class="client-actions">
             <button class="btn btn-secondary btn-small" onclick="testClient('${escapeHtml(c.client_id)}')">
               Test Configuration
             </button>
+            ${deleteBtn}
           </div>
-        `).join('');
-      } catch (err) {
-        console.log('error loading clients', err)
-        grid.innerHTML = `
-          <div class="empty-state" style="grid-column: 1/-1;">
-            <p>Error loading clients checking connection.</p>
-          </div>`;
-      }
+        </div>`;
     }
 
-    // --- Register Form ---
+    async function loadClients() {
+      const container = document.getElementById('clientsContainer');
+      let seededClients = [];
+
+      try {
+        const res = await fetch(API + '/clients');
+        if (!res.ok) throw new Error('Failed to load clients');
+        seededClients = await res.json();
+      } catch (err) {
+        console.log('error loading seeded clients', err);
+      }
+
+      const localClients = getLocalClients();
+
+      // Filter out any local client whose ID clashes with a seeded one (edge case)
+      const filteredLocal = localClients.filter(
+        lc => !seededClients.some(sc => sc.client_id === lc.client_id)
+      );
+
+      let html = '';
+
+      if (seededClients.length > 0) {
+        html += '<div class="group-label">Default Clients</div>';
+        html += '<div class="clients-grid">';
+        html += seededClients.map(c => renderClientCard(c, false)).join('');
+        html += '</div>';
+      }
+
+      if (filteredLocal.length > 0) {
+        html += '<div class="group-label">Your Clients (saved in this browser)</div>';
+        html += '<div class="clients-grid">';
+        html += filteredLocal.map(c => renderClientCard(c, true)).join('');
+        html += '</div>';
+      }
+
+      if (seededClients.length === 0 && filteredLocal.length === 0) {
+        html = `
+          <div class="empty-state">
+            <div class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+            <p>No clients found. Create your first configuration to get started.</p>
+          </div>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function deleteLocalClient(clientId) {
+      removeLocalClient(clientId);
+      showToast('Client deleted from your browser.');
+      loadClients();
+    }
+
+    // ── Register Form ─────────────────────────────────────────────────────────
+
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('registerBtn');
       btn.disabled = true;
-      btn.textContent = 'Creating...';
+      btn.textContent = 'Saving...';
 
-      const body = {
-        clientId: document.getElementById('reg-clientId').value.trim(),
-        algorithm: document.getElementById('reg-algorithm').value,
-        limit: parseInt(document.getElementById('reg-limit').value),
-        windowMs: parseInt(document.getElementById('reg-windowMs').value),
-      };
+      const clientId = document.getElementById('reg-clientId').value.trim();
+      const algorithm = document.getElementById('reg-algorithm').value;
+      const limit = parseInt(document.getElementById('reg-limit').value);
+      const windowMs = parseInt(document.getElementById('reg-windowMs').value);
+      const refillRate = algorithm === 'token-bucket'
+        ? parseFloat(document.getElementById('reg-refillRate').value)
+        : null;
 
-      if (body.algorithm === 'token-bucket') {
-        body.refillRate = parseFloat(document.getElementById('reg-refillRate').value);
-      }
-
-      try {
-        const res = await fetch(API + '/clients', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
-
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.message || 'Server error');
-        }
-
-        showToast('Client created successfully');
-        document.getElementById('registerForm').reset();
-        loadClients();
-      } catch (err) {
-        showToast(err.message, 'error');
-      } finally {
+      if (!clientId) {
+        showToast('Please enter a Client ID.', 'error');
         btn.disabled = false;
         btn.textContent = 'Create Client';
+        return;
       }
+
+      // Save only to localStorage — no DB write
+      const newClient = {
+        client_id: clientId,
+        algorithm,
+        max_requests: limit,
+        window_ms: windowMs,
+        refill_rate: refillRate,
+        created_at: new Date().toISOString(),
+      };
+
+      addLocalClient(newClient);
+      showToast('Client saved to your browser.');
+      document.getElementById('registerForm').reset();
+      document.getElementById('refillRow').style.display = 'none';
+      loadClients();
+
+      btn.disabled = false;
+      btn.textContent = 'Create Client';
     });
 
     document.getElementById('reg-algorithm').addEventListener('change', (e) => {
       document.getElementById('refillRow').style.display = e.target.value === 'token-bucket' ? 'grid' : 'none';
     });
 
-    // --- Check Limit Form ---
+    // ── Check Limit Form ──────────────────────────────────────────────────────
+
     document.getElementById('checkForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('checkBtn');
       btn.disabled = true;
       btn.textContent = 'Verifying...';
 
-      const body = { clientId: document.getElementById('check-clientId').value.trim() };
+      const clientId = document.getElementById('check-clientId').value.trim();
       const endpoint = document.getElementById('check-endpoint').value.trim();
+
+      const body = { clientId };
       if (endpoint) body.endpoint = endpoint;
+
+      // Attach inline config if this is a browser-local client
+      const inlineConfig = getLocalClientConfig(clientId);
+      if (inlineConfig) body.inlineConfig = inlineConfig;
 
       try {
         const res = await fetch(API + '/check', {
@@ -514,7 +645,8 @@
       document.querySelector('[data-tab="check"]').click();
     }
 
-    // --- Burst Test ---
+    // ── Burst Test ────────────────────────────────────────────────────────────
+
     let burstRunning = false;
 
     async function startBurst() {
@@ -525,6 +657,9 @@
 
       const count = parseInt(document.getElementById('burst-count').value) || 20;
       const delay = parseInt(document.getElementById('burst-delay').value) || 100;
+
+      // Resolve inline config for local clients
+      const inlineConfig = getLocalClientConfig(clientId);
 
       burstRunning = true;
       const btn = document.getElementById('burstBtn');
@@ -542,10 +677,13 @@
 
       for (let i = 1; i <= count; i++) {
         try {
+          const reqBody = { clientId };
+          if (inlineConfig) reqBody.inlineConfig = inlineConfig;
+
           const res = await fetch(API + '/check', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ clientId }),
+            body: JSON.stringify(reqBody),
           });
           const data = await res.json();
 

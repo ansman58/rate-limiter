@@ -26,8 +26,8 @@ export default async function checkRoutes(fastify: FastifyInstance): Promise<voi
       },
     },
     async (request: FastifyRequest<{ Body: CheckBody }>, reply: FastifyReply) => {
-      const { clientId, endpoint } = request.body;
-      const result = await checkRateLimit(fastify as AppInstance, clientId, endpoint);
+      const { clientId, endpoint, inlineConfig } = request.body;
+      const result = await checkRateLimit(fastify as AppInstance, clientId, endpoint, inlineConfig);
       const statusCode = result.allowed ? 200 : 429;
 
       reply.code(statusCode).send(result);

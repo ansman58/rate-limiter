@@ -9,6 +9,17 @@ export const checkSchema = {
   properties: {
     clientId: { type: 'string', minLength: 1 },
     endpoint: { type: 'string', minLength: 1 },
+    inlineConfig: {
+      type: 'object',
+      required: ['algorithm', 'limit', 'windowMs'],
+      properties: {
+        algorithm: { type: 'string', enum: ['fixed-window', 'sliding-window', 'token-bucket'] },
+        limit: { type: 'integer', minimum: 1 },
+        windowMs: { type: 'integer', minimum: 1000 },
+        refillRate: { type: 'number', minimum: 0.1 },
+      },
+      additionalProperties: false,
+    },
   },
   additionalProperties: false,
 } as const;
