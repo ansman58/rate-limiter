@@ -9,6 +9,15 @@ export function createPool(): Pool {
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 5000,
   };
+
+  if (process.env.POSTGRES_URL) {
+    return new Pool({
+      connectionString: process.env.POSTGRES_URL,
+      ssl: { rejectUnauthorized: false },
+      ...commonOptions,
+    });
+  }
+
   const host = process.env.POSTGRES_HOST || "localhost";
   const isLocal = host === "localhost" || host === "127.0.0.1";
 
